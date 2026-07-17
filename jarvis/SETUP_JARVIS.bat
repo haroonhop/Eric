@@ -1,6 +1,7 @@
 @echo off
-REM ==================== JARVIS AI Setup Script for Windows ====================
-REM This script automates the installation and setup of JARVIS AI Assistant
+REM ==================== JARVIS AI - All-in-One Setup & Start ====================
+REM This script installs dependencies AND starts the application
+REM Place this file in the jarvis folder and double-click to run
 REM ============================================================================
 
 setlocal enabledelayedexpansion
@@ -10,6 +11,7 @@ set "GREEN=[92m"
 set "YELLOW=[93m"
 set "RED=[91m"
 set "BLUE=[94m"
+set "CYAN=[96m"
 set "RESET=[0m"
 
 REM Set console to UTF-8
@@ -17,22 +19,31 @@ chcp 65001 >nul 2>&1
 
 echo %GREEN%
 echo ╔═══════════════════════════════════════════════════════════╗
-echo ║           JARVIS AI - Installation Wizard                 ║
+echo ║           JARVIS AI - Setup ^& Launch Wizard              ║
 echo ║        Hybrid Online/Offline Personal Assistant           ║
 echo ╚═══════════════════════════════════════════════════════════╝
 echo %RESET%
 
+REM Get the script directory and navigate to jarvis folder
+set "SCRIPT_DIR=%~dp0"
+cd /d "%SCRIPT_DIR%"
+
+REM Check if we're in the jarvis folder, if not try to find it
+if exist "backend" (
+    echo %GREEN%✓ Found jarvis folder%RESET%
+) else (
+    echo %RED%Error: Please place this setup file in the jarvis folder%RESET%
+    echo Current directory: %CD%
+    pause
+    exit /b 1
+)
+
 REM Check if running as administrator
 net session >nul 2>&1
 if %errorLevel% neq 0 (
-    echo %YELLOW%Warning: This script should be run as Administrator for best results.%RESET%
-    echo %YELLOW%Some features may not work without elevated privileges.%RESET%
+    echo %YELLOW%Note: For best results, run as Administrator.%RESET%
     echo.
 )
-
-REM Get the script directory
-set "SCRIPT_DIR=%~dp0"
-cd /d "%SCRIPT_DIR%"
 
 echo %BLUE%Step 1: Checking Prerequisites...%RESET%
 echo ---------------------------------------------------------------
@@ -153,9 +164,8 @@ if not exist "backend\.env" (
         echo.
         echo # Database Settings
         echo DATABASE_URL=sqlite:///./jarvis.db
-        echo # For PostgreSQL: postgresql://user:password@localhost:5432/jarvis
         echo.
-        echo # Redis Settings (optional, for caching)
+        echo # Redis Settings (optional)
         echo REDIS_URL=redis://localhost:6379
         echo.
         echo # API Keys (Optional - for online mode)
@@ -169,7 +179,6 @@ if not exist "backend\.env" (
         echo.
         echo # Mode Settings
         echo MODE=hybrid
-        echo # Options: online, offline, hybrid
         echo.
         echo # Offline Model Settings
         echo OLLAMA_BASE_URL=http://localhost:11434
@@ -204,13 +213,13 @@ echo.
 echo %BLUE%Step 5: Additional Setup%RESET%
 echo ---------------------------------------------------------------
 
-REM Check if Playwright browsers need to be installed
+REM Install Playwright browsers
 echo Installing Playwright browsers (for browser automation)...
 call python -m playwright install chromium 2>nul
 if %errorLevel% equ 0 (
     echo %GREEN%✓ Playwright browsers installed%RESET%
 ) else (
-    echo %YELLOW%Note: Playwright installation skipped or failed%RESET%
+    echo %YELLOW%Note: Playwright installation skipped or will be installed later%RESET%
 )
 
 echo.
@@ -218,34 +227,55 @@ echo %GREEN%================================================================%RES
 echo %GREEN%                    SETUP COMPLETE!                             %RESET%
 echo %GREEN%================================================================%RESET%
 echo.
-echo %BLUE%Next Steps:%RESET%
+echo %CYAN%Starting JARVIS AI Assistant...%RESET%
 echo.
-echo 1. Configure your API keys in backend\.env (optional for offline mode)
-echo    - OpenAI API key for GPT models
-echo    - ElevenLabs API key for voice synthesis
-echo    - Or use local models with Ollama for offline operation
+
+REM Check if virtual environment exists
+if not exist "backend\venv\Scripts\activate.bat" (
+    echo %RED%Error: Virtual environment not found%RESET%
+    pause
+    exit /b 1
+)
+
+REM Check if node_modules exists
+if not exist "frontend\node_modules" (
+    echo %RED%Error: Node modules not found%RESET%
+    pause
+    exit /b 1
+)
+
+echo %BLUE%Starting Backend Server...%RESET%
+start "JARVIS Backend" cmd /k "cd backend && venv\Scripts\activate && python main.py"
+
+REM Wait for backend to initialize
+timeout /t 3 /nobreak >nul
+
+echo %BLUE%Starting Frontend Server...%RESET%
+start "JARVIS Frontend" cmd /k "cd frontend && npm run dev"
+
 echo.
-echo 2. To start JARVIS:
-echo    %YELLOW%Option A - Quick Start:%RESET%
-echo      Run: start.bat
+echo %GREEN%================================================================%RESET%
+echo %GREEN%              SERVERS STARTING...                               %RESET%
+echo %GREEN%================================================================%RESET%
 echo.
-echo    %YELLOW%Option B - Manual Start:%RESET%
-echo      Terminal 1 (Backend):
-echo        cd backend
-echo        venv\Scripts\activate
-echo        python main.py
+echo %BLUE%Backend:%RESET%  http://localhost:8000
+echo %BLUE%Frontend:%RESET% http://localhost:5173
 echo.
-echo      Terminal 2 (Frontend):
-echo        cd frontend
-echo        npm run dev
+echo %YELLOW%Both servers are starting in separate windows.%RESET%
+echo %YELLOW%You can close this window once both servers are running.%RESET%
 echo.
-echo 3. Open your browser to http://localhost:5173
+echo %BLUE%To stop the servers:%RESET%
+echo   - Close the backend and frontend command windows
+echo   - Or press Ctrl+C in each window
 echo.
-echo %BLUE%Documentation:%RESET%
-echo   - README.md - General overview
-echo   - OPTIMIZATION_SUMMARY.md - Recent improvements
-echo   - REFACTORING_PLAN.md - Architecture details
+echo %CYAN%Opening browser in 5 seconds...%RESET%
+
+timeout /t 5 /nobreak >nul
+
+REM Try to open browser
+start http://localhost:5173
+
 echo.
-echo %YELLOW%For support, please refer to the documentation or open an issue.%RESET%
+echo %GREEN%Done! Enjoy using JARVIS!%RESET%
 echo.
 pause
