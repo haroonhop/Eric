@@ -2,6 +2,30 @@
 
 A modern AI-powered personal assistant inspired by Iron Man's JARVIS, designed to work across Windows, macOS, Linux, Android, and the Web.
 
+## 🚀 Quick Start (Windows)
+
+**Easy 3-Step Setup:**
+
+1. **Double-click** `SETUP_JARVIS.bat` 
+2. Wait for automatic installation (~2-5 minutes)
+3. JARVIS opens automatically in your browser!
+
+That's it! The setup script handles everything:
+- ✅ Checks Python & Node.js installation
+- ✅ Installs all dependencies
+- ✅ Creates configuration files
+- ✅ Starts backend & frontend servers
+- ✅ Opens JARVIS in your browser at http://localhost:5173
+
+**Requirements:**
+- Windows 10/11
+- Python 3.10+ ([Download](https://www.python.org/downloads/))
+- Node.js 18+ ([Download](https://nodejs.org/))
+
+> ⚠️ **Important:** During Python installation, make sure to check **"Add Python to PATH"**
+
+---
+
 ## 🎯 Objective
 
 Build a futuristic, responsive AI assistant that:
@@ -339,8 +363,20 @@ Futuristic interface featuring:
 
 ## 🛠️ Installation
 
-### Backend Setup
+### ⚡ Quick Setup (Windows - Recommended)
 
+**Just double-click `SETUP_JARVIS.bat`!** 
+
+The all-in-one setup script will:
+- ✅ Check prerequisites (Python & Node.js)
+- ✅ Install all dependencies automatically
+- ✅ Create configuration files
+- ✅ Start the servers
+- ✅ Open JARVIS in your browser
+
+### Manual Setup
+
+#### Backend Setup
 ```bash
 cd backend
 python -m venv venv
@@ -348,25 +384,11 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-### Frontend Setup
-
+#### Frontend Setup
 ```bash
 cd frontend
 npm install
-```
-
-### Mobile Setup
-
-```bash
-cd mobile
-flutter pub get
-```
-
-### Desktop Setup
-
-```bash
-cd desktop
-npm install
+npm run dev
 ```
 
 ## 🐳 Docker Deployment
